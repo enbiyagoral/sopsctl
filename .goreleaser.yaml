@@ -1,0 +1,74 @@
+version: 2
+
+project_name: sopsctl
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: sopsctl
+    main: ./cmd/sopsctl
+    binary: sopsctl
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+
+brews:
+  - name: sopsctl
+    repository:
+      owner: enbiyagoral
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/enbiyagoral/sopsctl"
+    description: "SOPS profile manager - select profiles for encryption with fzf"
+    license: "Apache-2.0"
+    install: |
+      bin.install "sopsctl"
+    test: |
+      system "#{bin}/sopsctl", "--help"
+
+release:
+  github:
+    owner: enbiyagoral
+    name: sopsctl
+  draft: false
+  prerelease: auto
