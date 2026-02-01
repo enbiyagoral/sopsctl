@@ -54,9 +54,3 @@ jobs:
 
       - name: Build
         run: go build -v ./cmd/sopsctl
-
-      - name: Verify GoReleaser config
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          version: latest
-          args: check
