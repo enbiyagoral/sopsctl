@@ -177,20 +177,50 @@ var profileEditCmd = &cobra.Command{
 }
 
 var profileUseCmd = &cobra.Command{
-	Use:   "use <name>",
+	Use:   "use [name]",
 	Short: "Set default profile and output env export",
 	Long: `Set a profile as the default and print environment export statement.
 
-Use with eval to set SOPS environment variables in your shell:
+If no profile name is given, opens fzf to select interactively.
 
-  eval "$(sopsy profile use stg)"
-  
+Examples:
+  sopsy profile use stg       # Use specific profile
+  sopsy profile use           # Select with fzf
+   
 After this, you can use standard SOPS commands:
   sops -e -i secrets.yaml
   sops -d secrets.yaml`,
-	Args: cobra.ExactArgs(1),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		name := args[0]
+		var name string
+
+		if len(args) == 0 {
+			// Interactive selection with fzf
+			profiles := cfg.ListProfiles()
+			if len(profiles) == 0 {
+				return fmt.Errorf("no profiles configured, run: sopsy profile add <name> --age-key-file <path>")
+			}
+
+			// Build list of profile names
+			var names []string
+			for _, p := range profiles {
+				names = append(names, p.Name)
+			}
+
+			// Try fzf
+			selected, err := selectWithFzf(names)
+			if err != nil {
+				// Fallback: list profiles
+				fmt.Fprintln(os.Stderr, "Available profiles:")
+				for _, n := range names {
+					fmt.Fprintf(os.Stderr, "  - %s\n", n)
+				}
+				return fmt.Errorf("specify profile name: sopsy profile use <name>")
+			}
+			name = selected
+		} else {
+			name = args[0]
+		}
 
 		// Get profile (also verifies it exists)
 		profile, err := cfg.GetProfile(name)
@@ -209,6 +239,68 @@ After this, you can use standard SOPS commands:
 		}
 
 		// Output export statement for shell integration
+		if profile.Age != nil && profile.Age.KeyFile != "" {
+			keyPath := profile.Age.GetKeyFilePath()
+			fmt.Printf("export SOPS_AGE_KEY_FILE=\"%s\"\n", keyPath)
+		}
+
+		return nil
+	},
+}
+
+// selectWithFzf uses fzf to select from a list of options
+func selectWithFzf(options []string) (string, error) {
+	// Check if fzf is available
+	_, err := exec.LookPath("fzf")
+	if err != nil {
+		return "", fmt.Errorf("fzf not found")
+	}
+
+	cmd := exec.Command("fzf", "--height=10", "--prompt=Select profile: ")
+	cmd.Stderr = os.Stderr
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return "", err
+	}
+
+	go func() {
+		for _, opt := range options {
+			if _, err := fmt.Fprintln(stdin, opt); err != nil {
+				return
+			}
+		}
+		_ = stdin.Close()
+	}()
+
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	selected := string(out)
+	if len(selected) > 0 && selected[len(selected)-1] == '\n' {
+		selected = selected[:len(selected)-1]
+	}
+
+	return selected, nil
+}
+
+var profileCurrentCmd = &cobra.Command{
+	Use:    "current",
+	Short:  "Show current default profile env",
+	Hidden: true, // Internal use for shell integration
+	Args:   cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if cfg.DefaultProfile == "" {
+			return nil
+		}
+
+		profile, err := cfg.GetProfile(cfg.DefaultProfile)
+		if err != nil {
+			return nil // Silently fail if profile not found
+		}
+
 		if profile.Age != nil && profile.Age.KeyFile != "" {
 			keyPath := profile.Age.GetKeyFilePath()
 			fmt.Printf("export SOPS_AGE_KEY_FILE=\"%s\"\n", keyPath)
@@ -251,4 +343,5 @@ func init() {
 	profileCmd.AddCommand(profileEditCmd)
 	profileCmd.AddCommand(profileUseCmd)
 	profileCmd.AddCommand(profileResetCmd)
+	profileCmd.AddCommand(profileCurrentCmd)
 }

@@ -94,6 +94,15 @@ sopsy() {
     else echo "$output" >&2; return $rc; fi
   else command sopsy "$@"; fi
 }
+
+# Auto-load default profile on terminal start
+if command -v sopsy &>/dev/null; then
+  _sopsy_output=$(command sopsy profile current 2>/dev/null)
+  if [[ -n "$_sopsy_output" ]]; then
+    eval "$_sopsy_output"
+  fi
+  unset _sopsy_output
+fi
 `
 
 func init() {
