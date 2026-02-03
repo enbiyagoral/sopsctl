@@ -72,7 +72,7 @@ Examples:
 			return err
 		}
 
-		fmt.Printf("Profile '%s' added successfully\n", name)
+		fmt.Printf("✓ Profile '%s' added\n", name)
 		return nil
 	},
 }

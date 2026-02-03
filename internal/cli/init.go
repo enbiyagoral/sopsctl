@@ -88,8 +88,19 @@ sopsy() {
   if [[ "${1:-}" == "profile" && "${2:-}" == "use" ]]; then
     local output; output=$(command sopsy "$@" 2>&1); local rc=$?
     if [[ $rc -eq 0 ]]; then
+      # Extract profile name from args if present, or parse from output if needed
+      local profile_name="${3:-}"
+      if [[ -z "$profile_name" ]]; then
+         # If no arg (fzf mode), we can't easily get the name from args, 
+         # but let's just show a generic success or try to parse if we really want.
+         # For now, let's keep it simple.
+         echo "✓ Profile activated"
+      else
+         echo "✓ Profile activated: $profile_name"
+      fi
+      
       while IFS= read -r line; do
-        [[ "$line" == export\ * ]] && eval "$line" && echo "✓ Set ${line#export }"
+        [[ "$line" == export\ * ]] && eval "$line"
       done <<< "$output"
     else echo "$output" >&2; return $rc; fi
   else command sopsy "$@"; fi
