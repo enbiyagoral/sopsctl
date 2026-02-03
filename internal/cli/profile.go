@@ -178,14 +178,23 @@ var profileEditCmd = &cobra.Command{
 
 var profileUseCmd = &cobra.Command{
 	Use:   "use <name>",
-	Short: "Set default profile",
-	Long:  `Set a profile as the default. This profile will be used automatically when no -p flag is specified.`,
-	Args:  cobra.ExactArgs(1),
+	Short: "Set default profile and output env export",
+	Long: `Set a profile as the default and print environment export statement.
+
+Use with eval to set SOPS environment variables in your shell:
+
+  eval "$(sopsctl profile use stg)"
+  
+After this, you can use standard SOPS commands:
+  sops -e -i secrets.yaml
+  sops -d secrets.yaml`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 
-		// Verify profile exists
-		if _, err := cfg.GetProfile(name); err != nil {
+		// Get profile (also verifies it exists)
+		profile, err := cfg.GetProfile(name)
+		if err != nil {
 			return err
 		}
 
@@ -199,7 +208,12 @@ var profileUseCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Default profile set to '%s'\n", name)
+		// Output export statement for shell integration
+		if profile.Age != nil && profile.Age.KeyFile != "" {
+			keyPath := profile.Age.GetKeyFilePath()
+			fmt.Printf("export SOPS_AGE_KEY_FILE=\"%s\"\n", keyPath)
+		}
+
 		return nil
 	},
 }

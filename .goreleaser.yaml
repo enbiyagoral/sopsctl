@@ -61,11 +61,34 @@ brews:
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
     homepage: "https://github.com/enbiyagoral/sopsctl"
-    description: "SOPS profile manager - select profiles for encryption with fzf"
+    description: "SOPS profile manager - manage age key profiles for encryption"
     license: "Apache-2.0"
-    install: |
+    install: |-
       bin.install "sopsctl"
-    test: |
+    post_install: |-
+      # Auto-install shell integration
+      zshrc = File.expand_path("~/.zshrc")
+      marker = "# sopsctl shell integration"
+      
+      if File.exist?(zshrc) && !File.read(zshrc).include?(marker)
+        File.open(zshrc, "a") do |f|
+          f.puts ""
+          f.puts marker
+          f.puts 'sopsctl() {'
+          f.puts '  if [[ "${1:-}" == "profile" && "${2:-}" == "use" ]]; then'
+          f.puts '    local output; output=$(command sopsctl "$@" 2>&1); local rc=$?'
+          f.puts '    if [[ $rc -eq 0 ]]; then'
+          f.puts '      while IFS= read -r line; do'
+          f.puts '        [[ "$line" == export\\ * ]] && eval "$line" && echo "✓ Set ${line#export }"'
+          f.puts '      done <<< "$output"'
+          f.puts '    else echo "$output" >&2; return $rc; fi'
+          f.puts '  else command sopsctl "$@"; fi'
+          f.puts '}'
+        end
+        ohai "Shell integration installed to #{zshrc}"
+        ohai "Restart your terminal or run: source ~/.zshrc"
+      end
+    test: |-
       system "#{bin}/sopsctl", "--help"
 
 release:
