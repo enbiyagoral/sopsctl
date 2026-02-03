@@ -1,4 +1,4 @@
-// Package cli provides the command-line interface for sopsctl.
+// Package cli provides the command-line interface for sopsy.
 package cli
 
 import (
@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/enbiyagoral/sopsctl/internal/config"
+	"github.com/enbiyagoral/sopsy/internal/config"
 )
 
 var (
@@ -19,18 +19,18 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "sopsctl",
+	Use:   "sopsy",
 	Short: "SOPS profile manager",
-	Long: `sopsctl is a profile manager for SOPS.
+	Long: `sopsy is a profile manager for SOPS.
 
 Manage multiple age key files as profiles and set SOPS_AGE_KEY_FILE
 for your shell, so you can use the native sops CLI directly.
 
 Quick start:
-  1. Initialize:     sopsctl config init
-  2. Add profile:    sopsctl profile add stg --age-key-file ~/.sops/stg.txt
-  3. Shell setup:    echo 'eval "$(sopsctl init zsh)"' >> ~/.zshrc
-  4. Use profile:    sopsctl profile use stg
+  1. Initialize:     sopsy config init
+  2. Add profile:    sopsy profile add stg --age-key-file ~/.sops/stg.txt
+  3. Shell setup:    echo 'eval "$(sopsy init zsh)"' >> ~/.zshrc
+  4. Use profile:    sopsy profile use stg
   5. Use sops:       sops -e -i secrets.yaml`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
@@ -58,7 +58,7 @@ Quick start:
 				cfg = config.NewConfig()
 				return nil
 			}
-			return fmt.Errorf("failed to load config: %w\nRun 'sopsctl config init' to create one", err)
+			return fmt.Errorf("failed to load config: %w\nRun 'sopsy config init' to create one", err)
 		}
 
 		return nil
@@ -66,7 +66,7 @@ Quick start:
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default: ~/.config/sopsctl/config.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default: ~/.config/sopsy/config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&profileName, "profile", "p", "", "profile to use")
 
 	// Add subcommands

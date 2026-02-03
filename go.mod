@@ -1,4 +1,4 @@
-module github.com/enbiyagoral/sopsctl
+module github.com/enbiyagoral/sopsy
 
 go 1.25.4
 

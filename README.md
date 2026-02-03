@@ -1,9 +1,9 @@
-# sopsctl
+# sopsy
 
 SOPS profile manager.
 
 ## Install
 
 ```bash
-brew install enbiyagoral/tap/sopsctl
+brew install enbiyagoral/tap/sopsy
 ```

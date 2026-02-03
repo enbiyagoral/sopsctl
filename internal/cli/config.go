@@ -8,21 +8,21 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/enbiyagoral/sopsctl/internal/config"
+	"github.com/enbiyagoral/sopsy/internal/config"
 )
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Manage sopsctl configuration",
-	Long:  `Manage sopsctl configuration (init, show, edit).`,
+	Short: "Manage sopsy configuration",
+	Long:  `Manage sopsy configuration (init, show, edit).`,
 }
 
 var configInitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize configuration file",
-	Long: `Create a new sopsctl configuration file.
+	Long: `Create a new sopsy configuration file.
 
-The config file will be created at ~/.config/sopsctl/config.yaml`,
+The config file will be created at ~/.config/sopsy/config.yaml`,
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path, err := config.DefaultConfigPath()
@@ -50,9 +50,9 @@ The config file will be created at ~/.config/sopsctl/config.yaml`,
 
 		fmt.Printf("Configuration created at %s\n", path)
 		fmt.Println("\nNext steps:")
-		fmt.Println("  1. Add a profile:   sopsctl profile add <name> --age-key-file <path>")
-		fmt.Println("  2. Set default:     sopsctl profile use <name>")
-		fmt.Println("  3. Encrypt a file:  sopsctl encrypt <file>")
+		fmt.Println("  1. Add a profile:   sopsy profile add <name> --age-key-file <path>")
+		fmt.Println("  2. Set default:     sopsy profile use <name>")
+		fmt.Println("  3. Encrypt a file:  sopsy encrypt <file>")
 		return nil
 	},
 }

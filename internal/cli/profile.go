@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/enbiyagoral/sopsctl/internal/config"
+	"github.com/enbiyagoral/sopsy/internal/config"
 )
 
 var profileCmd = &cobra.Command{
@@ -25,13 +25,13 @@ var profileAddCmd = &cobra.Command{
 
 Examples:
   # Add profile with age key file (recommended)
-  sopsctl profile add dev --description "Development" --age-key-file "~/.config/sops/age/keys.txt"
+  sopsy profile add dev --description "Development" --age-key-file "~/.config/sops/age/keys.txt"
   
   # Add profile with explicit age public key
-  sopsctl profile add dev --description "Development" --age "age1..."
+  sopsy profile add dev --description "Development" --age "age1..."
   
   # Add profile with multiple age recipients
-  sopsctl profile add team --age "age1abc..." --age "age1def..."`,
+  sopsy profile add team --age "age1abc..." --age "age1def..."`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
@@ -183,7 +183,7 @@ var profileUseCmd = &cobra.Command{
 
 Use with eval to set SOPS environment variables in your shell:
 
-  eval "$(sopsctl profile use stg)"
+  eval "$(sopsy profile use stg)"
   
 After this, you can use standard SOPS commands:
   sops -e -i secrets.yaml

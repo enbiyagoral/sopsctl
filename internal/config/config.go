@@ -1,4 +1,4 @@
-// Package config handles sopsctl configuration loading, saving, and management.
+// Package config handles sopsy configuration loading, saving, and management.
 package config
 
 import (
@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config represents the main sopsctl configuration.
+// Config represents the main sopsy configuration.
 type Config struct {
 	Version        string              `yaml:"version"`
 	DefaultProfile string              `yaml:"default_profile,omitempty"`
@@ -24,7 +24,7 @@ type DirMap struct {
 	Auto    bool   `yaml:"auto"`
 }
 
-// Settings contains global sopsctl settings.
+// Settings contains global sopsy settings.
 type Settings struct {
 	FZFOptions string `yaml:"fzf_options,omitempty"`
 	SOPSPath   string `yaml:"sops_path,omitempty"`
@@ -36,7 +36,7 @@ func DefaultConfigPath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
-	return filepath.Join(home, ".config", "sopsctl", "config.yaml"), nil
+	return filepath.Join(home, ".config", "sopsy", "config.yaml"), nil
 }
 
 // NewConfig creates a new empty configuration with defaults.

@@ -10,16 +10,16 @@ import (
 )
 
 const banner = `
-  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃                                                                ┃
-  ┃   ███████  ██████  ██████  ███████  ██████ ████████ ██         ┃
-  ┃   ██      ██    ██ ██   ██ ██      ██         ██    ██         ┃
-  ┃   ███████ ██    ██ ██████  ███████ ██         ██    ██         ┃
-  ┃        ██ ██    ██ ██           ██ ██         ██    ██         ┃
-  ┃   ███████  ██████  ██      ███████  ██████    ██    ███████    ┃
-  ┃                                                                ┃
-  ┃   🔐 SOPS Profile Manager                                      ┃
-  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃                                                      ┃
+  ┃   ███████  ██████  ██████  ███████ ██    ██          ┃
+  ┃   ██      ██    ██ ██   ██ ██       ██  ██           ┃
+  ┃   ███████ ██    ██ ██████  ███████   ████            ┃
+  ┃        ██ ██    ██ ██           ██    ██             ┃
+  ┃   ███████  ██████  ██      ███████    ██             ┃
+  ┃                                                      ┃
+  ┃   🔐 SOPS Profile Manager                            ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 `
 
 var initCmd = &cobra.Command{
@@ -27,12 +27,12 @@ var initCmd = &cobra.Command{
 	Short: "Install shell integration",
 	Long: `Install shell integration to your shell config file.
 
-This adds a shell function that makes 'sopsctl profile use <name>' 
+This adds a shell function that makes 'sopsy profile use <name>' 
 automatically set SOPS_AGE_KEY_FILE in your current shell.
 
 Examples:
-  sopsctl init zsh    # Install to ~/.zshrc
-  sopsctl init bash   # Install to ~/.bashrc`,
+  sopsy init zsh    # Install to ~/.zshrc
+  sopsy init bash   # Install to ~/.bashrc`,
 	Args:      cobra.ExactArgs(1),
 	ValidArgs: []string{"zsh", "bash"},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -50,7 +50,7 @@ Examples:
 
 		// Check if already installed
 		content, err := os.ReadFile(configFile)
-		if err == nil && strings.Contains(string(content), "# sopsctl shell integration") {
+		if err == nil && strings.Contains(string(content), "# sopsy shell integration") {
 			fmt.Printf("✓ Already installed in %s\n", configFile)
 			return nil
 		}
@@ -77,22 +77,22 @@ Examples:
 		fmt.Printf("  source %s\n", configFile)
 		fmt.Println()
 		fmt.Println("Then switch profiles with:")
-		fmt.Println("  sopsctl profile use <name>")
+		fmt.Println("  sopsy profile use <name>")
 		return nil
 	},
 }
 
 const shellFunction = `
-# sopsctl shell integration
-sopsctl() {
+# sopsy shell integration
+sopsy() {
   if [[ "${1:-}" == "profile" && "${2:-}" == "use" ]]; then
-    local output; output=$(command sopsctl "$@" 2>&1); local rc=$?
+    local output; output=$(command sopsy "$@" 2>&1); local rc=$?
     if [[ $rc -eq 0 ]]; then
       while IFS= read -r line; do
         [[ "$line" == export\ * ]] && eval "$line" && echo "✓ Set ${line#export }"
       done <<< "$output"
     else echo "$output" >&2; return $rc; fi
-  else command sopsctl "$@"; fi
+  else command sopsy "$@"; fi
 }
 `
 

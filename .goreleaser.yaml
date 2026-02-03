@@ -1,15 +1,15 @@
 version: 2
 
-project_name: sopsctl
+project_name: sopsy
 
 before:
   hooks:
     - go mod tidy
 
 builds:
-  - id: sopsctl
-    main: ./cmd/sopsctl
-    binary: sopsctl
+  - id: sopsy
+    main: ./cmd/sopsy
+    binary: sopsy
     env:
       - CGO_ENABLED=0
     goos:
@@ -54,29 +54,29 @@ changelog:
       - "^chore:"
 
 brews:
-  - name: sopsctl
+  - name: sopsy
     repository:
       owner: enbiyagoral
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/enbiyagoral/sopsctl"
+    homepage: "https://github.com/enbiyagoral/sopsy"
     description: "SOPS profile manager - manage age key profiles for encryption"
     license: "Apache-2.0"
     install: |-
-      bin.install "sopsctl"
+      bin.install "sopsy"
     caveats: |-
       To enable shell integration, run:
-        sopsctl init zsh
+        sopsy init zsh
       
       Then restart your terminal or run:
         source ~/.zshrc
     test: |-
-      system "#{bin}/sopsctl", "--help"
+      system "#{bin}/sopsy", "--help"
 
 release:
   github:
     owner: enbiyagoral
-    name: sopsctl
+    name: sopsy
   draft: false
   prerelease: auto

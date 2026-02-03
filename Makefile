@@ -2,11 +2,11 @@
 
 # Build binary
 build:
-	go build -o bin/sopsctl ./cmd/sopsctl
+	go build -o bin/sopsy ./cmd/sopsy
 
 # Install to GOPATH/bin
 install:
-	go install ./cmd/sopsctl
+	go install ./cmd/sopsy
 
 # Run tests
 test:
@@ -26,4 +26,4 @@ tidy:
 
 # Build and run
 run: build
-	./bin/sopsctl $(ARGS)
+	./bin/sopsy $(ARGS)
