@@ -47,7 +47,7 @@ Examples:
 		if err != nil {
 			return fmt.Errorf("failed to open %s: %w", configFile, err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 
 		_, err = f.WriteString(shellFunction)
 		if err != nil {
