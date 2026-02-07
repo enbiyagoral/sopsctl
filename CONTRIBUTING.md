@@ -46,13 +46,14 @@ Before you ask a question, it is best to search for existing [Issues](https://gi
 
 ### Commit Messages
 
-We use [Conventional Commits](https://www.conventionalcommits.org/).
+We use [Conventional Commits](https://www.conventionalcommits.org/). **Merge to `main` triggers [go-semantic-release](https://github.com/go-semantic-release/semantic-release)**: commit types determine the next version (feat → minor, fix → patch, BREAKING CHANGE → major), a tag is created, and [GoReleaser](https://goreleaser.com/) builds and publishes the release. All in Go, no Node.js.
 
-- `feat:` for new features
-- `fix:` for bug fixes
+- `feat:` for new features (minor bump)
+- `fix:` for bug fixes (patch bump)
 - `docs:` for documentation changes
 - `chore:` for build tasks, package manager configs, etc.
 - `style:` for formatting changes
+- Footer `BREAKING CHANGE:` or `!` after type for major version bump
 
 ### Go Code Style
 
